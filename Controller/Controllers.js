@@ -26,6 +26,7 @@ async function create_employee(Employee) {
     const surname = Employee.surname;
     const accounting_type = Employee.accounting_type;
     const experience = Employee.experience;
+    const salary = auto_set_salary(Employee);
     console.log(JSON.stringify(Employee));
     switch (type) {
         case "12" : {
@@ -33,7 +34,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await manager.save(manager).then(result => {
                 console.log(JSON.stringify(manager) + ' created');
@@ -46,7 +48,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await analyst.save(analyst).then(result => {
                 console.log(JSON.stringify(analyst) + ' created');
@@ -59,7 +62,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await designer.save(designer).then(result => {
                 console.log(JSON.stringify(designer) + ' created');
@@ -72,7 +76,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await programmer.save(programmer).then(result => {
                 console.log(JSON.stringify(programmer) + ' created');
@@ -85,7 +90,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await tester.save(tester).then(result => {
                 console.log(JSON.stringify(tester) + ' created');
@@ -98,7 +104,8 @@ async function create_employee(Employee) {
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
-                experience: experience
+                experience: experience,
+                salary: salary
             });
             return await maintenance_worker.save(maintenance_worker).then(result => {
                 console.log(JSON.stringify(maintenance_worker) + ' created');
@@ -109,10 +116,6 @@ async function create_employee(Employee) {
         default : {
             console.error("Type of employee can not detect . Please check code ");
         }
-        //TODO: yorum satirlarini kaldir bu fonksiyonlar calissin (CREATE EMPLOYEE)
-        //auto_set_salary(emp)
-        // employees.push(emp)
-        // emp_last_id++;
     }
 }
 
@@ -182,9 +185,9 @@ async function assign_emp_to_project(Employee) { // Faz
                     }
                 }
                 if (can_assign)
-                    console.log(employee.name, employee.active_project.name, " e atandı . ")
+                    console.log(employee.name, employee.active_project.name, " e atandı . ");
                 else
-                    console.log(employee.name, "Atanamadı.")
+                    console.log(employee.name, "Atanamadı.");
                 return can_assign;
             });
 
@@ -237,7 +240,7 @@ async function auto_set_salary(employee) { // Faz
             where: {
                 id: employee.id,
             }
-        }).then(async employee => {//TODO modellerdeki experience kismini integer yap
+        }).then(async employee => {
             employee.salary = employee.experience * 800;
             employee.update({salary: employee.salary}, {where: {id: employee.id}});
         });
@@ -261,12 +264,14 @@ function create_project(newProject) { // Yusuf
 }
 
 
-function load_projects() { // Aykut
-
+async function load_projects() { // Aykut
+    const projects = await Project.findAll();
+    return projects;
 }
 
-function load_employees() { // Aykut
-
+async function load_employees() { // Aykut
+    const employees = await getEmployees();
+    return employees;
 }
 
 function get_infos() { // Aykut
@@ -343,7 +348,7 @@ function dbFinder(EmployeeDepartment) {
             return Designer;
         case "Programmer":
             console.log('PROGRAMMER');
-            return Programmer
+            return Programmer;
         case  "Tester":
             console.log('TESTER');
             return Tester;
