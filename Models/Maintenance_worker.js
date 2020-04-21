@@ -15,16 +15,16 @@ const Maintenance_worker = db.define('Maintenance_worker', {
             type: sequelize.Sequelize.STRING,
         },
         active_project: {
-            type: sequelize.Sequelize.STRING,
+            type: sequelize.Sequelize.ARRAY(sequelize.Sequelize.INTEGER),
         },
         accounting_type: {
-            type: sequelize.Sequelize.STRING,
+            type: sequelize.Sequelize.INTEGER,
         },
         salary: {
             type: sequelize.Sequelize.INTEGER,
         },
         experience: {
-            type: sequelize.Sequelize.STRING,
+            type: sequelize.Sequelize.INTEGER,
         }
     },
     {
