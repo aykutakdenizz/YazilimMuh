@@ -1,12 +1,9 @@
 const express = require('express');
 const db = require('./Conf/dbConf');
 const port = process.env.PORT || 8000;
-const { assign_emp_to_project,auto_set_salary,create_project,start_project,finish_project,show_employees,show_projects} = require('./Controller/Controllers');
-const Manager = require('./Models/Manager');
-const Designer = require('./Models/Designer');
-const Project = require('./Models/Project');
+const bodyParser = require('body-parser');
 const app = express();
-
+const cors = require('cors');
 
 db.authenticate().then(() => {
     console.log('Database connected..');
@@ -14,8 +11,21 @@ db.authenticate().then(() => {
     console.log('Database can not connect; ' + err)
 });
 
-db.sync();//{force:true}//modellerle tablo olusturur
+db.sync();////modellerle tablo olusturur
+app.use(bodyParser.urlencoded({extended : false}));
+app.use(bodyParser.json());
+app.use(cors());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*',);
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Origin, Accept,Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+/*
 app.use('/hi', async (req, res, next) => {
     let Employee={type:'Designer',id:2};
     let project={id:4,name:'p1',despriction:'d1',min_emp: 5,max_emp: 10,max_analyst: 5,max_designer: 4,max_programmer: 3,max_tester: 2,max_maintenance: 1};
@@ -30,6 +40,8 @@ app.use('/hi', async (req, res, next) => {
         response: 'hi'
     })
 });
+*/
+app.use('/',require('./Route/routes'));
 
 
 app.use((req, res, next) => {

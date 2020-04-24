@@ -7,7 +7,7 @@ class MainPage extends Component {
     render() {
         return (
             <React.Fragment>
-                <h1>Hiiiii</h1>
+                <h1>Welcome Home</h1>
             </React.Fragment>
         );
     }

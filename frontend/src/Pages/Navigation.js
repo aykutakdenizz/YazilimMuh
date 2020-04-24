@@ -17,6 +17,7 @@ const Navigation = props =>(
                 <li><NavLink to="/Manager">Manager</NavLink></li>
                 <li><NavLink to="/Programmer">Programmer</NavLink></li>
                 <li><NavLink to="/Tester">Tester</NavLink></li>
+                <li><NavLink to="/AllEmployee">All Employees</NavLink></li>
             </ul>
         </nav>
     </header>

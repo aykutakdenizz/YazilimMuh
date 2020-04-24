@@ -12,22 +12,26 @@ function add_listeners() {
     document.getElementById("addEmployeeButton").addEventListener("click", create_employee);
 }
 
-async function load_all_data() {
-    console.log("\n\n!!! 'await Load_all_data()' seklinde cekilmezse gelecek verileri beklemeden fonksiyon sonlanir !!! \n\n");
-    const projects = await Project.findAll();
-    return projects;
+exports.load_all_data = (req, res, next) => {
+    Project.findAll().then(response => {
+        res.status(201).json({
+            Response: response
+        });
+    }).catch(err => {
+        res.status(500).json({
+            Error: 'load_all_data:' + err
+        });
 
-}
+    });
+};
 
-async function create_employee(Employee) {
-    console.log("Employee Olusturuluyor");
-    const type = Employee.type;
-    const name = Employee.name;
-    const surname = Employee.surname;
-    const accounting_type = Employee.accounting_type;
-    const experience = Employee.experience;
-    const salary = auto_set_salary(Employee);
-    console.log(JSON.stringify(Employee));
+exports.create_employee = (req, res, next) => {
+    const type = req.body.type;
+    const name = req.body.name;
+    const surname = req.body.surname;
+    const accounting_type = req.body.accounting_type;
+    const experience = req.body.experience;
+    const salary = auto_set_salary(accounting_type, type, experience);
     switch (type) {
         case "12" : {
             const manager = new Manager({
@@ -37,11 +41,16 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await manager.save(manager).then(result => {
-                console.log(JSON.stringify(manager) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi manager yaratilamadi.')
+            manager.save(manager).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in manager:' + err
+                });
             });
+            return;
         }
         case "13" : {
             const analyst = new Analyst({
@@ -51,11 +60,16 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await analyst.save(analyst).then(result => {
-                console.log(JSON.stringify(analyst) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi analyst yaratilamadi.')
+            analyst.save(analyst).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in analyst:' + err
+                });
             });
+            return;
         }
         case "14" : {
             const designer = new Designer({
@@ -65,11 +79,16 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await designer.save(designer).then(result => {
-                console.log(JSON.stringify(designer) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi designer yaratilamadi.')
+            designer.save(designer).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in designer:' + err
+                });
             });
+            return;
         }
         case "15" : {
             const programmer = new Programmer({
@@ -79,11 +98,16 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await programmer.save(programmer).then(result => {
-                console.log(JSON.stringify(programmer) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi programmer yaratilamadi.')
+            programmer.save(programmer).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in programmer:' + err
+                });
             });
+            return;
         }
         case "16" : {
             const tester = new Tester({
@@ -93,11 +117,16 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await tester.save(tester).then(result => {
-                console.log(JSON.stringify(tester) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi tester yaratilamadi.')
+            tester.save(tester).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in tester:' + err
+                });
             });
+            return;
         }
         case "17" : {
             const maintenance_worker = new Maintenance_worker({
@@ -107,17 +136,24 @@ async function create_employee(Employee) {
                 experience: experience,
                 salary: salary
             });
-            return await maintenance_worker.save(maintenance_worker).then(result => {
-                console.log(JSON.stringify(maintenance_worker) + ' created');
-            }).catch(e => {
-                console.log(e + ' hatasi maintenance_worker yaratilamadi.')
+            maintenance_worker.save(maintenance_worker).then(result => {
+                return res.status(201).json({
+                    Response: result
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'create_employee in maintenance_worker:' + err
+                });
             });
+            return;
         }
         default : {
-            console.error("Type of employee can not detect . Please check code ");
+            return res.status(500).json({
+                Error: 'create_employee in default somethings went wrong !'
+            });
         }
     }
-}
+};
 
 function try_assign(employee, project) { // Faz
     switch (employee.constructor.name) {
@@ -162,12 +198,14 @@ function try_assign(employee, project) { // Faz
     }
 }
 
-async function assign_emp_to_project(Employee) { // Faz
-    const db = await dbFinder(Employee.type);
+exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
+    const type = req.body.type;
+    const employee_id = req.body.employee_id;
+    const db = dbFinder(type);
     console.log(db);
     db.findOne({
         where: {
-            id: Employee.id,
+            id: employee_id
         }
     }).then(async employee => {
         if (employee.active_project === null) {
@@ -177,165 +215,203 @@ async function assign_emp_to_project(Employee) { // Faz
                     if (projects[i].current_emp_num < projects[i].max_emp) {
                         can_assign = try_assign(employee, projects[i]);
                         if (can_assign) {
-                            employee.active_project = projects[i];
+                            let employeeProjects = [];
+                            employeeProjects.push(projects[i].id);
+                            employee.update({active_project: employeeProjects}, {where: {id: employee.id}});
                             projects[i].current_emp_num++;
                             projects[i].update({current_emp_num: projects[i].current_emp_num}, {where: {id: projects[i].id}});
                             break;
                         }
                     }
                 }
-                if (can_assign)
-                    console.log(employee.name, employee.active_project.name, " e atandı . ");
-                else
+                if (can_assign) {
+                    console.log(employee.name, employee.active_project, " e atandı . ");
+                    return res.status(201).json({
+                        Response: can_assign
+                    });
+                } else {
                     console.log(employee.name, "Atanamadı.");
-                return can_assign;
+                    return res.status(400).json({
+                        Response: can_assign
+                    });
+                }
             });
 
         } else {
             console.error("Bu kişi zaten atandı.");
-            return false;
+            return res.status(400).json({
+                Response: false
+            });
         }
     }).catch(err => {
-        console.log('Employee catch in assigment ERROR is:' + err)
+        return res.status(500).json({
+            Response: 'Employee catch in assigment ERROR is:' + err
+        });
     });
-}
+};
 
-function calculate_compensation(employee) { // Yusuf
+function calculate_compensation(salary) { // Yusuf
     // This function can be customized .
-    return employee.salary * 8.72
+    return salary * 8.72;
 }
 
-async function auto_set_salary(employee) { // Faz
-    if (employee.accounting_type === 0) {
-        switch (employee.constructor.name) {
-            case "Manager":
-                employee.salary = 11025;
-                Manager.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
-            case "Analyst":
-                employee.salary = 8127;
-                Analyst.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
-            case "Designer":
-                employee.salary = 7543;
-                Designer.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
-            case "Programmer":
-                employee.salary = 7512;
-                Programmer.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
-            case  "Tester":
-                employee.salary = 5000;
-                Tester.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
-            case "Maintenance_worker":
-                employee.salary = 6999;
-                Maintenance_worker.update({salary: employee.salary}, {where: {id: employee.id}});
-                break;
+function auto_set_salary(accounting_type, constructor_name, experience) { // Faz
+    if (accounting_type === 0) {
+        switch (constructor_name) {
+            case "12":
+                return 11025;
+            case "13":
+                return 8127;
+            case "14":
+                return 7543;
+            case "15":
+                return 7512;
+            case  "16":
+                return 5000;
+            case "17":
+                return 6999;
         }
     } else {
-        const db = await dbFinder(employee.constructor.name.toString());
-        console.log(db);
-        db.findOne({
-            where: {
-                id: employee.id,
-            }
-        }).then(async employee => {
-            employee.salary = employee.experience * 800;
-            employee.update({salary: employee.salary}, {where: {id: employee.id}});
-        });
+        return experience * 800;
     }
-    console.log(employee.name, "İçin ayarlanmış maaş ", employee.salary)
 }
 
-function create_project(newProject) { // Yusuf
+exports.create_project = (req, res, next) => { // Yusuf
     const project = new Project({
-        name: newProject.name,
-        despriction: newProject.despriction,
-        min_emp: newProject.min_emp,
-        max_emp: newProject.max_emp,
-        max_analyst: newProject.max_analyst,
-        max_designer: newProject.max_designer,
-        max_programmer: newProject.max_programmer,
-        max_tester: newProject.max_tester,
-        max_maintenance: newProject.max_maintenance
+        name: req.body.name,
+        despriction: req.body.despriction,
+        min_emp: req.body.min_emp,
+        max_emp: req.body.max_emp,
+        max_analyst: req.body.max_analyst,
+        max_designer: req.body.max_designer,
+        max_programmer: req.body.max_programmer,
+        max_tester: req.body.max_tester,
+        max_maintenance: req.body.max_maintenance,
+        active: false,
+        is_finished: false,
     });
-    project.save();
-}
+    project.save().then(result => {
+        res.status(201).json({
+            Response: result
+        });
+    }).catch(err => {
+        res.status(500).json({
+            Error: 'create_project err:' + err
+        });
+    });
+};
 
 
-async function load_projects() { // Aykut
-    const projects = await Project.findAll();
-    return projects;
-}
+exports.load_projects = (req, res, next) => {
+    Project.findAll().then(response => {
+        res.status(201).json({
+            Response: response
+        });
+    }).catch(err => {
+        res.status(500).json({
+            Error: 'load_all_data:' + err
+        });
 
-async function load_employees() { // Aykut
-    const employees = await getEmployees();
-    return employees;
-}
+    });
+};
+
+exports.load_employees = async (req, res, next) => { // Aykut
+    await getEmployees().then(result => {
+        res.status(200).json({
+            Response: result
+        })
+    }).catch(err => {
+        res.status(500).json({
+            Error: 'Bus can not find !! => ERR:' + err
+        });
+    });
+};
 
 function get_infos() { // Aykut
     // last idleri ayarla
 }
 
-function start_project(project) { // Faz
-    if (project.current_emp_num > project.min_emp) {
-        Project.update({active:true,start_date:new Date()},{where:{id:project.id}});
-    } else {
-        // GUI İŞİ VAR UYAR ADAMI
-        console.error("Proje gereklilikleri sağlamıyor başlayamaz")
-    }
-}
-
-async function finish_project(project1) { // Yusuf
-    const project = await Project.findOne({where:{id:project1.id}});
-    project.update({end_date: new Date(),is_finished: true}, {where: {id: project.id}});
-
-    let employees = await getEmployees();
-    console.log(JSON.stringify(employees));
-    for (let i = 0; i < employees.length; i++) {
-        console.log(employees[i]);//TODO active project sutunu integer array olacak
-        if (employees[i].active_project !== null && employees[i].active_project.id === project.id) {
-            let db = await dbFinder(employees[i].constructor.name.toString());
-            db.findOne({
-                where: {
-                    id: employees[i].id,
-                }
-            }).then(async employee => {
-                employee.update({active_project: null}, {where: {id: employee.id}});
+exports.start_project = (req, res, next) => { // Faz(project)
+    Project.findOne({where: {id: req.body.project_id}}).then(project => {
+        if (project.current_emp_num >= project.min_emp) {
+            Project.update({active: true, start_date: new Date()}, {where: {id: project.id}}).then(result => {
+                return res.status(201).json({
+                    Response: result[0]
+                });
+            }).catch(err => {
+                return res.status(500).json({
+                    Error: 'in start_project updating => ERR:' + err
+                });
             });
-            if (!await assign_emp_to_project(employees[i])) {
-                dismissal_employee(employees[i]);
-            }
+        } else {
+            return res.status(400).json({
+                Error: 'Can not start, Not enough current employee !'
+            });
         }
+    }).catch(err => {
+        return res.status(500).json({
+            Error: 'start_project => ERR:' + err
+        });
+    });
+
+};
+
+exports.finish_project = async (req, res, next) => { // Yusuf (project1)
+    let dismisals = [];
+    const project = await Project.findOne({
+        where: {
+            id: req.body.project_id
+        }
+    });
+    project.update({end_date: new Date(), is_finished: true, active: false}, {where: {id: project.id}});
+
+    const managers = await Manager.findAll();
+    const analysts = await Analyst.findAll();
+    const designers = await Designer.findAll();
+    const m = await Maintenance_worker.findAll();
+    const programmers = await Programmer.findAll();
+    const testers = await Tester.findAll();
+    try {
+        await finishProjectForEmployee(managers, project, Manager, dismisals);
+        await finishProjectForEmployee(analysts, project, Analyst, dismisals);
+        await finishProjectForEmployee(designers, project, Designer, dismisals);
+        await finishProjectForEmployee(m, project, Maintenance_worker, dismisals);
+        await finishProjectForEmployee(programmers, project, Programmer, dismisals);
+        await finishProjectForEmployee(testers, project, Tester, dismisals);
+    } catch (e) {
+        return res.status(500).json({
+            Error: 'finish project error in for => ERR:' + e
+        });
     }
+    return res.status(200).json({
+        Response: dismisals
+    });
 
-}
 
-async function show_employees() { // Yusuf
-    console.log(JSON.stringify(await getEmployees()));
-}
+};
 
-async function show_projects() { // Yusuf
-    console.log(JSON.stringify(await Project.findAll()));
-}
-
-function dismissal_employee(employee) {  // Yusuf
+function dismissal_employee(employee,type) {  // Yusuf
     //employees = employees.filter(item => item !== employee)
     //Tazminat şeysini yap akjdalskas
     //compensation = calculate_compensation(employee)
-    console.log(employee.name, "İçin hesaplanan tazminat tutarı  ", compensation)
-    //GUIYE EKLE
+    return (type+" ID:"+employee.id+" "+employee.name + " "+ employee.surname+ "'s compensation is:" + calculate_compensation(employee.salary));
 }
 
-async function get_All_managers() {
-    const managers = await Manager.findAll();
-    return managers;
-}
+exports.get_specific_employees = async (req, res, next) => {
+    const dbObject = await dbFinder(req.body.type);
+    dbObject.findAll().then(result => {
+        return res.status(200).json({
+            Response: result
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            Error: 'get_specific_employees ERR1:' + err
+        });
+    })
+
+};
 
 function dbFinder(EmployeeDepartment) {
-    console.log(EmployeeDepartment);
-
     switch (EmployeeDepartment) {
         case "Manager":
             console.log('MANAGER');
@@ -361,7 +437,7 @@ function dbFinder(EmployeeDepartment) {
     }
 }
 
-async function getEmployees(){
+async function getEmployees() {
     let employees = [];
     const managers = await Manager.findAll();
     const analysts = await Analyst.findAll();
@@ -369,45 +445,105 @@ async function getEmployees(){
     const m = await Maintenance_worker.findAll();
     const programmers = await Programmer.findAll();
     const testers = await Tester.findAll();
-    managers.forEach(function(employee) {
+    managers.forEach(function (employee) {
+        employee.dataValues.type = "Manager";
         employees.push(employee.dataValues);
     });
-    analysts.forEach(function(employee) {
+    analysts.forEach(function (employee) {
+        employee.dataValues.type = "Analyst";
         employees.push(employee.dataValues);
     });
-    designers.forEach(function(employee) {
+    designers.forEach(function (employee) {
+        employee.dataValues.type = "Designer";
         employees.push(employee.dataValues);
     });
-    m.forEach(function(employee) {
+    m.forEach(function (employee) {
+        employee.dataValues.type = "Maintenance Worker";
         employees.push(employee.dataValues);
     });
-    programmers.forEach(function(employee) {
+    programmers.forEach(function (employee) {
+        employee.dataValues.type = "Programmer";
         employees.push(employee.dataValues);
     });
-    testers.forEach(function(employee) {
+    testers.forEach(function (employee) {
+        employee.dataValues.type = "Tester";
         employees.push(employee.dataValues);
     });
-    return  employees;
+    return employees;
 }
 
-module.exports = {
-    add_listeners,
-    load_all_data,
-    create_employee,
-    assign_emp_to_project,
-    try_assign,
-    calculate_compensation,
-    auto_set_salary,
-    create_project,
-    load_projects,
-    load_employees,
-    get_infos,
-    start_project,
-    finish_project,
-    show_employees,
-    show_projects,
-    dismissal_employee,
-    get_All_managers,
-    dbFinder,
-    getEmployees
-};
+function isWorkInProject(projects, project_id) {
+    let returnValue = false;
+    if (projects === null) {
+        return returnValue;
+    }
+    projects.forEach(element => {
+        if (element === project_id) {
+            returnValue = true;
+            return returnValue;
+        }
+    });
+    return returnValue;
+}
+
+function finishEmployeeProject(projects, project_id) {
+    let newProjects = [];
+    projects.forEach(element => {
+        if (element !== project_id) {
+            newProjects.push(element);
+        }
+    });
+    return newProjects;
+}
+
+async function finishProjectForEmployee(employees, project, dbObject, dismisals) {
+    for (let i = 0; i < employees.length; i++) {
+        if (isWorkInProject(employees[i].active_project, project.id)) {
+            let employee = null;
+            await dbObject.findOne({
+                where: {
+                    id: employees[i].id,
+                }
+            }).then(async employee2 => {
+                employee = employee2;
+            });
+            await employee.update({active_project: finishEmployeeProject(employee.active_project, project.id)}, {where: {id: employee.id}});
+            console.log(JSON.stringify(employee));
+            let isAssign = null;
+
+            if (!(employee.active_project.length > 0)) {
+                await Project.findAll().then(projects => {
+                    let can_assign = false;
+                    for (let i = 0; i < projects.length; i++) {
+                        if (projects[i].current_emp_num < projects[i].max_emp && projects[i].active === true) {
+                            can_assign = try_assign(employee, projects[i]);
+                            if (can_assign) {
+                                let employee_Projects = employee.active_project;
+                                employee_Projects.push(projects[i].id);
+                                employee.update({active_project: employee_Projects}, {where: {id: employee.id}});
+                                projects[i].current_emp_num++;
+                                projects[i].update({current_emp_num: projects[i].current_emp_num}, {where: {id: projects[i].id}});
+                                break;
+                            }
+                        }
+                    }
+                    if (can_assign)
+                        console.log(employee.name, employee.active_project.name, " e atandı . ");
+                    else
+                        console.log(employee.name, "Atanamadı.");
+
+                    isAssign = can_assign;
+                });
+
+            } else {
+                console.error("Bu kişi zaten atandı.");
+                isAssign=  false;
+            }
+            console.log("isAssign :" + isAssign);
+            if (isAssign === false) {
+                dismisals.push(dismissal_employee(employee,employee.constructor.name.toString()));
+            }
+
+        }
+    }
+}

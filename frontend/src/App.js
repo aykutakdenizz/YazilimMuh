@@ -5,6 +5,13 @@ import './App.css';
 import MainPage from "./Pages/MainPage";
 import Navigation from './Pages/Navigation';
 import Project from "./Pages/Project";
+import Manager from "./Pages/Empolyees/Manager";
+import Analyst from "./Pages/Empolyees/Analyst";
+import Designer from "./Pages/Empolyees/Designer";
+import Maintenance_worker from "./Pages/Empolyees/Maintenance_worker";
+import Programmer from "./Pages/Empolyees/Programmer";
+import Tester from "./Pages/Empolyees/Tester";
+import AllEmployees from "./Pages/Empolyees/AllEmployees";
 
 class App extends React.Component {
     render() {
@@ -17,6 +24,13 @@ class App extends React.Component {
                             <Route path="/" component={null}/>
                             <Route path="/MainPage" component={MainPage}/>
                             <Route path="/Project" component={Project}/>
+                            <Route path="/Manager" component={Manager}/>
+                            <Route path="/Analyst" component={Analyst}/>
+                            <Route path="/Designer" component={Designer}/>
+                            <Route path="/MaintenanceWorker" component={Maintenance_worker}/>
+                            <Route path="/Programmer" component={Programmer}/>
+                            <Route path="/Tester" component={Tester}/>
+                            <Route path="/AllEmployee" component={AllEmployees}/>
                         </Switch>
                     </main>
                 </React.Fragment>

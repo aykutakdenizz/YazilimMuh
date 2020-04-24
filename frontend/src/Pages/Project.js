@@ -1,21 +1,22 @@
 import React, {Component} from 'react';
-
+import {connect} from "react-redux";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-//const { load_projects} = require('../../../Controller/Controllers');
-//let projects = [];
+import {finish_project, load_projects, start_project} from "../Actions";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+
+//import './Projects.css';
 
 class Project extends Component {
 
-    loadProjects = async () => {
-        const list = [{},{}];//await load_projects();
-        return list;
-    };
+    componentDidMount() {
+        this.props.load_projects();
+    }
 
     render() {
-        const projectList = this.loadProjects().map(project => {
+        const projectList = this.props.reducer.Projects.map(project => {
                 return (
-                    <tr key={project.Id} className="event__list-item">
+                    <tr key={project.id} className="event__list-item">
                         <td>{project.manager_id}</td>
                         <td>{project.id}</td>
                         <td>{project.name}</td>
@@ -24,14 +25,19 @@ class Project extends Component {
                         <td>{project.max_emp}</td>
                         <td>{project.start_date}</td>
                         <td>{project.end_date}</td>
-                        <td>{project.is_finished}</td>
-                        <td>{project.active}</td>
-                        <td>{project.max_analyst}</td>
-                        <td>{project.max_designer}</td>
-                        <td>{project.max_programmer}</td>
-                        <td>{project.max_tester}</td>
-                        <td>{project.max_maintenance}</td>
                         <td>{project.current_emp_num}</td>
+                        <td>
+                            <ButtonGroup vertical>
+                                <Button variant="success" onClick={() => {
+                                    this.props.start_project({project_id:project.id},this.props.reducer.Projects);
+                                    this.props.load_projects();
+                                }}>Start</Button>
+                                <Button variant="danger" onClick={() => {
+                                    this.props.finish_project({project_id:project.id});
+                                    this.props.load_projects();
+                                }}>Finish</Button>
+                            </ButtonGroup>
+                        </td>
                     </tr>
 
                 )
@@ -39,33 +45,49 @@ class Project extends Component {
         );
         return (
             <React.Fragment>
-                <Table responsive>
+                <Table striped bordered hover>
                     <thead>
                     <tr>
-                        <th>Manager</th>
-                        <th>Id</th>
+                        <th>Manager ID</th>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Description</th>
-                        <th>Min emp</th><th>Max emp</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Finished</th>
-                        <th>Active</th>
-                        <th>Max Analyst</th>
-                        <th>Max Designer</th>
-                        <th>Max Programmer</th>
-                        <th>Max Tester</th>
-                        <th>Max Maintenance</th>
+                        <th>Min Emp</th>
+                        <th>Max Emp</th>
+                        <th>Start Time</th>
+                        <th>Finish Time</th>
                         <th>Current Employee</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
-                    <tbody>{projectList}</tbody>
+                    <tbody>
+                    {projectList}
+                    </tbody>
                 </Table>
             </React.Fragment>
         );
-
     }
 }
 
-export default Project;
 
+const mapStateToProps = (state) => {
+    return {
+        reducer: state.reducer,
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        load_projects: () => {
+            dispatch(load_projects());
+        },
+        start_project: (body, projects) => {
+            dispatch(start_project(body, projects));
+        },
+        finish_project: (body) => {
+            dispatch(finish_project(body));
+        }
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Project);
