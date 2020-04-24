@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import Table from "react-bootstrap/Table";
 
 import {get_specific_employees} from "../../Actions";
+import Card from "react-bootstrap/Card";
 
 //import './Projects.css';
 
@@ -33,22 +34,26 @@ class Analyst extends Component {
         }
         return (
             <React.Fragment>
-                <Table striped bordered hover>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Surname</th>
-                        <th>Projects</th>
-                        <th>Accounting Type</th>
-                        <th>Salary</th>
-                        <th>Experience</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {list}
-                    </tbody>
-                </Table>
+                <Card>
+                    <Card.Body>
+                        <Table responsive>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Projects</th>
+                                <th>Accounting Type</th>
+                                <th>Salary</th>
+                                <th>Experience</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {list}
+                            </tbody>
+                        </Table>
+                    </Card.Body>
+                </Card>
             </React.Fragment>
         );
     }

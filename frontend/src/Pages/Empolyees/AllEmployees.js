@@ -3,8 +3,7 @@ import {connect} from "react-redux";
 import Table from "react-bootstrap/Table";
 
 import {load_employees} from "../../Actions";
-
-//import './Projects.css';
+import Card from "react-bootstrap/Card";
 
 
 class AllEmployees extends Component {
@@ -34,23 +33,27 @@ class AllEmployees extends Component {
         }
         return (
             <React.Fragment>
-                <Table striped bordered hover>
-                    <thead>
-                    <tr>
-                        <th>Profession</th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Surname</th>
-                        <th>Projects</th>
-                        <th>Accounting Type</th>
-                        <th>Salary</th>
-                        <th>Experience</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {list}
-                    </tbody>
-                </Table>
+                <Card>
+                    <Card.Body>
+                        <Table responsive striped bordered hover>
+                            <thead>
+                            <tr>
+                                <th>Profession</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Projects</th>
+                                <th>Accounting Type</th>
+                                <th>Salary</th>
+                                <th>Experience</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {list}
+                            </tbody>
+                        </Table>
+                    </Card.Body>
+                </Card>
             </React.Fragment>
         );
     }

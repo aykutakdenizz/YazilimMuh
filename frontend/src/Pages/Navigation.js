@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+
 import './Navigation.css';
 
 
 const Navigation = props =>(
     <header className="main-navigation">
         <div className="main-navigation_logo">
-            <NavLink to="/MainPage"><h1>SISTEM</h1></NavLink>
+            <NavLink to="/MainPage"><h1>SYSTEM</h1></NavLink>
         </div>
         <nav className="main-navigation_items">
             <ul>

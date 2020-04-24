@@ -1,7 +1,7 @@
 import React from 'react';
 import {Switch} from "react-bootstrap";
 import {BrowserRouter, Route} from 'react-router-dom';
-import './App.css';
+
 import MainPage from "./Pages/MainPage";
 import Navigation from './Pages/Navigation';
 import Project from "./Pages/Project";
@@ -12,6 +12,9 @@ import Maintenance_worker from "./Pages/Empolyees/Maintenance_worker";
 import Programmer from "./Pages/Empolyees/Programmer";
 import Tester from "./Pages/Empolyees/Tester";
 import AllEmployees from "./Pages/Empolyees/AllEmployees";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css'
 
 class App extends React.Component {
     render() {
