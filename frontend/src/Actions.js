@@ -30,7 +30,9 @@ export function load_all_data() {
 
 export function create_employee(employee) {
     return async dispatch => {
-        let newEmployee = null;
+        let response = null;
+        let error = false;
+        let show = false;
         await fetch('http://localhost:8000/create_employee', {
             method: 'POST',
             headers: {
@@ -39,19 +41,26 @@ export function create_employee(employee) {
             body: JSON.stringify(employee)
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
-                throw new Error('Failed!');
+                error = true;
             }
             return res.json();
         }).then(resData => {
-            newEmployee = resData.Response;
+            if(error===true){
+                response = resData.Error;
+            }
+            else{
+                show = true;
+                response = resData.Response.name+" "+resData.Response.surname+" is created."
+            }
         }).catch(err => {
             console.log(err);
         });
         dispatch({
             type: "create_employee",
             payload: {
-                NewEmployee: newEmployee,
-                Type: employee.type
+                Response: response,
+                Error: error,
+                Show: show
             }
         });
     };
@@ -60,6 +69,8 @@ export function create_employee(employee) {
 export function assign_emp_to_project(reqbody) {
     return async dispatch => {
         let response = null;
+        let error = false;
+        let show = false;
         await fetch('http://localhost:8000/assign_emp_to_project', {
             method: 'POST',
             headers: {
@@ -68,17 +79,26 @@ export function assign_emp_to_project(reqbody) {
             body: JSON.stringify(reqbody)
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
-                throw new Error('Failed!');
+                error = true;
             }
             return res.json();
         }).then(resData => {
-            response = resData.Response;
+            if(error===true){
+                response = resData.Error;
+            }else{
+                response = resData.Response;
+                show = true;
+            }
         }).catch(err => {
             console.log(err);
         });
         dispatch({
             type: "assign_emp_to_project",
-            payload: response
+            payload: {
+                Response:response,
+                Error: error,
+                Show: show
+            }
         });
     };
 }
@@ -86,6 +106,8 @@ export function assign_emp_to_project(reqbody) {
 export function create_project(project, projects) {
     return async dispatch => {
         let newProjects = [];
+        let error = false;
+        let response = null;
         await fetch('http://localhost:8000/create_project', {
             method: 'POST',
             headers: {
@@ -94,21 +116,30 @@ export function create_project(project, projects) {
             body: JSON.stringify(project)
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
-                throw new Error('Failed!');
+                error = true;
             }
             return res.json();
         }).then(resData => {
-            projects.forEach(aProject => {
-                newProjects.push(aProject);
-            });
-            newProjects.push(resData.Response)
+            if (error===true){
+                response = resData.Error;
+            }
+            else{
+                projects.forEach(aProject => {
+                    newProjects.push(aProject);
+                });
+                newProjects.push(resData.Response)
+            }
         }).catch(err => {
             console.log(err);
         });
 
         dispatch({
             type: "create_project",
-            payload: newProjects
+            payload: {
+                Projects:newProjects,
+                Error:error,
+                Response: response
+            }
         });
     };
 }
@@ -144,7 +175,8 @@ export function load_projects() {
 
 export function start_project(reqBody, projects) {
     return async dispatch => {
-        let response = null;
+        let response = true;
+        let error = false;
         let newProjects = [];
         projects.forEach(aProject => {
             newProjects.push(aProject)
@@ -157,14 +189,20 @@ export function start_project(reqBody, projects) {
             body: JSON.stringify(reqBody)
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
-                throw new Error('Failed!');
+                response = false;
             }
             return res.json();
         }).then(resData => {
-            if (resData.Response === 1) {
-                response = true;
+            if (response === false) {
+                console.log(resData.Error);
+                response = resData.Error;
+                error = true;
             } else {
-                response = false;
+                if (resData.Response === 1) {
+                    response = true;
+                } else {
+                    response = false;
+                }
             }
         }).catch(err => {
             console.log(err);
@@ -173,7 +211,8 @@ export function start_project(reqBody, projects) {
             type: "start_project",
             payload: {
                 Projects: newProjects,
-                Response: response
+                Response: response,
+                Error: error
             }
         });
     };
@@ -182,6 +221,7 @@ export function start_project(reqBody, projects) {
 export function finish_project(reqBody) {
     return async dispatch => {
         let response = null;
+        let error = false;
         await fetch('http://localhost:8000/finish_project', {
             method: 'POST',
             headers: {
@@ -190,18 +230,25 @@ export function finish_project(reqBody) {
             body: JSON.stringify(reqBody)
         }).then(res => {
             if (res.status !== 200 && res.status !== 201) {
-                //response= res.body;
-                throw new Error('Failed!');
+                error = true;
             }
             return res.json();
         }).then(resData => {
-            response = resData.Response;
+            if(error){
+                response = resData.Error;
+            }else{
+                response = resData.Response;
+            }
+
         }).catch(err => {
             console.log(err);
         });
         dispatch({
             type: "finish_project",
-            payload: response
+            payload: {
+                Response:response,
+                Error: error
+            }
         });
     };
 }
@@ -264,6 +311,23 @@ export function get_specific_employees(reqBody) {
                 Type: reqBody.type,
                 Employees: employees
             }
+        });
+    };
+}
+
+export function set_error_false() {
+    return async dispatch => {
+        dispatch({
+            type: "set_error_false",
+            payload: false
+        });
+    };
+}
+export function set_show_false() {
+    return async dispatch => {
+        dispatch({
+            type: "set_show_false",
+            payload: false
         });
     };
 }

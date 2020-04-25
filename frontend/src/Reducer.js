@@ -9,7 +9,9 @@ const initialReducer = {
     Employees: [],
     SelectedProject: null,
     SelectedEmployee: null,
-    Response: null,
+    Response: "NO",
+    Error:false,
+    Show:false,
 };
 
 const Reducer = (state = initialReducer, action) => {
@@ -23,13 +25,16 @@ const Reducer = (state = initialReducer, action) => {
         case "start_project":
             state = {
                 ...state,
-                Response: action.payload
+                Response: action.payload.Response,
+                Projects: action.payload.Projects,
+                Error: action.payload.Error
             };
             break;
         case "finish_project":
             state = {
                 ...state,
-                Response: action.payload
+                Response: action.payload.Response,
+                Error: action.payload.Error
             };
             break;
         case "get_specific_employees":
@@ -71,10 +76,40 @@ const Reducer = (state = initialReducer, action) => {
                 Employees: action.payload
             };
             break;
-        case "FIND_BUS":
+        case "set_error_false":
             state = {
                 ...state,
-                FindBus: action.payload
+                Error: action.payload
+            };
+            break;
+        case "set_show_false":
+            state = {
+                ...state,
+                Show: action.payload
+            };
+            break;
+        case "create_project":
+            state = {
+                ...state,
+                Projects: action.payload.Projects,
+                Error: action.payload.Error,
+                Response: action.payload.Response
+            };
+            break;
+        case "assign_emp_to_project":
+            state = {
+                ...state,
+                Response: action.payload.Response,
+                Show: action.payload.Show,
+                Error: action.payload.Error
+            };
+            break;
+        case "create_employee":
+            state = {
+                ...state,
+                Response: action.payload.Response,
+                Show: action.payload.Show,
+                Error: action.payload.Error
             };
             break;
         default:

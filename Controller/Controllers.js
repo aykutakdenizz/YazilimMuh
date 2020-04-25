@@ -19,7 +19,7 @@ exports.load_all_data = (req, res, next) => {
         });
     }).catch(err => {
         res.status(500).json({
-            Error: 'load_all_data:' + err
+            Error: 'Error occurs in database ERR:' + err
         });
 
     });
@@ -33,13 +33,14 @@ exports.create_employee = (req, res, next) => {
     const experience = req.body.experience;
     const salary = auto_set_salary(accounting_type, type, experience);
     switch (type) {
-        case "12" : {
+        case "Manager" : {
             const manager = new Manager({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             manager.save(manager).then(result => {
                 return res.status(201).json({
@@ -47,18 +48,19 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in manager:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
-        case "13" : {
+        case "Analyst" : {
             const analyst = new Analyst({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             analyst.save(analyst).then(result => {
                 return res.status(201).json({
@@ -66,18 +68,19 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in analyst:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
-        case "14" : {
+        case "Designer" : {
             const designer = new Designer({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             designer.save(designer).then(result => {
                 return res.status(201).json({
@@ -85,18 +88,19 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in designer:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
-        case "15" : {
+        case "Programmer" : {
             const programmer = new Programmer({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             programmer.save(programmer).then(result => {
                 return res.status(201).json({
@@ -104,18 +108,19 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in programmer:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
-        case "16" : {
+        case "Tester" : {
             const tester = new Tester({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             tester.save(tester).then(result => {
                 return res.status(201).json({
@@ -123,18 +128,19 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in tester:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
-        case "17" : {
+        case "Maintenance Worker" : {
             const maintenance_worker = new Maintenance_worker({
                 name: name,
                 surname: surname,
                 accounting_type: accounting_type,
                 experience: experience,
-                salary: salary
+                salary: salary,
+                active_project: []
             });
             maintenance_worker.save(maintenance_worker).then(result => {
                 return res.status(201).json({
@@ -142,14 +148,14 @@ exports.create_employee = (req, res, next) => {
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'create_employee in maintenance_worker:' + err
+                    Error: 'Error occurs in database ERR::' + err
                 });
             });
             return;
         }
         default : {
             return res.status(500).json({
-                Error: 'create_employee in default somethings went wrong !'
+                Error: 'This type is invalid !'
             });
         }
     }
@@ -201,6 +207,7 @@ function try_assign(employee, project) { // Faz
 exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
     const type = req.body.type;
     const employee_id = req.body.employee_id;
+    let assignedProject=null;
     const db = dbFinder(type);
     console.log(db);
     db.findOne({
@@ -208,7 +215,7 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
             id: employee_id
         }
     }).then(async employee => {
-        if (employee.active_project === null) {
+        if (!(employee.active_project.length >= 0)) {
             await Project.findAll().then(projects => {
                 let can_assign;
                 for (let i = 0; i < projects.length; i++) {
@@ -220,6 +227,7 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
                             employee.update({active_project: employeeProjects}, {where: {id: employee.id}});
                             projects[i].current_emp_num++;
                             projects[i].update({current_emp_num: projects[i].current_emp_num}, {where: {id: projects[i].id}});
+                            assignedProject= projects[i];
                             break;
                         }
                     }
@@ -227,12 +235,12 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
                 if (can_assign) {
                     console.log(employee.name, employee.active_project, " e atandı . ");
                     return res.status(201).json({
-                        Response: can_assign
+                        Response: employee.name+" assign to ID:"+ assignedProject.id+" Name:"+assignedProject.name+"."
                     });
                 } else {
                     console.log(employee.name, "Atanamadı.");
                     return res.status(400).json({
-                        Response: can_assign
+                        Response: employee.name+" can not assign"
                     });
                 }
             });
@@ -240,12 +248,12 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
         } else {
             console.error("Bu kişi zaten atandı.");
             return res.status(400).json({
-                Response: false
+                Error: 'This employee is already in a project'
             });
         }
     }).catch(err => {
         return res.status(500).json({
-            Response: 'Employee catch in assigment ERROR is:' + err
+            Error: 'Error occurs in database type or employee ID is invalid ERR:' + err
         });
     });
 };
@@ -258,17 +266,17 @@ function calculate_compensation(salary) { // Yusuf
 function auto_set_salary(accounting_type, constructor_name, experience) { // Faz
     if (accounting_type === 0) {
         switch (constructor_name) {
-            case "12":
+            case "Manager":
                 return 11025;
-            case "13":
+            case "Analyst":
                 return 8127;
-            case "14":
+            case "Designer":
                 return 7543;
-            case "15":
+            case "Programmer":
                 return 7512;
-            case  "16":
+            case  "Tester":
                 return 5000;
-            case "17":
+            case "Maintenance Worker":
                 return 6999;
         }
     } else {
@@ -278,6 +286,7 @@ function auto_set_salary(accounting_type, constructor_name, experience) { // Faz
 
 exports.create_project = (req, res, next) => { // Yusuf
     const project = new Project({
+        manager_id:req.body.manager_id,
         name: req.body.name,
         despriction: req.body.despriction,
         min_emp: req.body.min_emp,
@@ -289,6 +298,7 @@ exports.create_project = (req, res, next) => { // Yusuf
         max_maintenance: req.body.max_maintenance,
         active: false,
         is_finished: false,
+        current_emp_num:0,
     });
     project.save().then(result => {
         res.status(201).json({
@@ -296,7 +306,7 @@ exports.create_project = (req, res, next) => { // Yusuf
         });
     }).catch(err => {
         res.status(500).json({
-            Error: 'create_project err:' + err
+            Error: 'Error occurs in database ERR:' + err
         });
     });
 };
@@ -309,7 +319,7 @@ exports.load_projects = (req, res, next) => {
         });
     }).catch(err => {
         res.status(500).json({
-            Error: 'load_all_data:' + err
+            Error: 'Error occurs in database:' + err
         });
 
     });
@@ -322,7 +332,7 @@ exports.load_employees = async (req, res, next) => { // Aykut
         })
     }).catch(err => {
         res.status(500).json({
-            Error: 'Bus can not find !! => ERR:' + err
+            Error: 'Error occurs in database => ERR:' + err
         });
     });
 };
@@ -333,14 +343,19 @@ function get_infos() { // Aykut
 
 exports.start_project = (req, res, next) => { // Faz(project)
     Project.findOne({where: {id: req.body.project_id}}).then(project => {
+        if(project.active===true){
+            return res.status(500).json({
+                Error: 'Project is already active'
+            });
+        }
         if (project.current_emp_num >= project.min_emp) {
-            Project.update({active: true, start_date: new Date()}, {where: {id: project.id}}).then(result => {
+            Project.update({active: true, start_date: new Date(),end_date:null}, {where: {id: project.id}}).then(result => {
                 return res.status(201).json({
                     Response: result[0]
                 });
             }).catch(err => {
                 return res.status(500).json({
-                    Error: 'in start_project updating => ERR:' + err
+                    Error: 'Somethings went wrong=> ERR:' + err
                 });
             });
         } else {
@@ -350,7 +365,7 @@ exports.start_project = (req, res, next) => { // Faz(project)
         }
     }).catch(err => {
         return res.status(500).json({
-            Error: 'start_project => ERR:' + err
+            Error: 'Project can not find => ERR:' + err
         });
     });
 
@@ -363,6 +378,11 @@ exports.finish_project = async (req, res, next) => { // Yusuf (project1)
             id: req.body.project_id
         }
     });
+    if(project.active===false){
+        return res.status(500).json({
+            Error: 'Project is not active'
+        });
+    }
     project.update({end_date: new Date(), is_finished: true, active: false}, {where: {id: project.id}});
 
     const managers = await Manager.findAll();
@@ -405,7 +425,7 @@ exports.get_specific_employees = async (req, res, next) => {
         });
     }).catch(err => {
         return res.status(500).json({
-            Error: 'get_specific_employees ERR1:' + err
+            Error: 'Somethings went wrong ERR:' + err
         });
     })
 

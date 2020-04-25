@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 
 import {load_employees} from "../../Actions";
 import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 
 
 class AllEmployees extends Component {
@@ -17,7 +18,7 @@ class AllEmployees extends Component {
         if (this.props.reducer.Employees !== null) {
             list = this.props.reducer.Employees.map(obj => {
                     return (
-                        <tr key={obj.id} className="event__list-item">
+                        <tr key={obj.type+obj.id.toString()} className="event__list-item">
                             <td>{obj.type}</td>
                             <td>{obj.id}</td>
                             <td>{obj.name}</td>
@@ -54,6 +55,9 @@ class AllEmployees extends Component {
                         </Table>
                     </Card.Body>
                 </Card>
+                <Button variant="primary" onClick={this.props.load_employees}>
+                    Refresh
+                </Button>
             </React.Fragment>
         );
     }

@@ -4,6 +4,7 @@ import Table from "react-bootstrap/Table";
 
 import {get_specific_employees} from "../../Actions";
 import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 
 //import './Projects.css';
 
@@ -54,6 +55,9 @@ class Analyst extends Component {
                         </Table>
                     </Card.Body>
                 </Card>
+                <Button variant="primary" onClick={()=>{this.props.get_specific_employees({type: "Analyst"})}}>
+                    Refresh
+                </Button>
             </React.Fragment>
         );
     }

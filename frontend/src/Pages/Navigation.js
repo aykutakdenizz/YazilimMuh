@@ -1,13 +1,18 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 
 import './Navigation.css';
+import Navbar from "react-bootstrap/Navbar";
 
 
-const Navigation = props =>(
+const Navigation = props => (
     <header className="main-navigation">
         <div className="main-navigation_logo">
-            <NavLink to="/MainPage"><h1>SYSTEM</h1></NavLink>
+            <Navbar>
+                <Navbar.Brand href="/MainPage">
+                    <h1 className="main-navigation_logo_name">SYSTEM</h1>
+                </Navbar.Brand>
+            </Navbar>
         </div>
         <nav className="main-navigation_items">
             <ul>
