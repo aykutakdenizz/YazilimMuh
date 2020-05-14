@@ -35,7 +35,7 @@ class MainPage extends Component {
         const employee = {
             name: (this.EmployeeNameElement.current.value === "") ? ("Empty Name") : (this.EmployeeNameElement.current.value),
             surname: (this.EmployeeSurnameElement.current.value === "") ? ("Empty Surname") : (this.EmployeeSurnameElement.current.value),
-            accounting_type: (this.EmployeeAccountingTypeElement.current.value === 1) ? (1) : (0),
+            accounting_type: (this.EmployeeAccountingTypeElement.current.value === "1") ? (1) : (0),
             experience: (this.EmployeeExperienceElement.current.value === "") ? (0) : (this.EmployeeExperienceElement.current.value),
             type: (this.EmployeeProfessionElement.current.value === "") ? ("Maintenance Worker") : (this.EmployeeProfessionElement.current.value),
         };

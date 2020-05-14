@@ -34,7 +34,8 @@ const Reducer = (state = initialReducer, action) => {
             state = {
                 ...state,
                 Response: action.payload.Response,
-                Error: action.payload.Error
+                Error: action.payload.Error,
+                Show: action.payload.Show
             };
             break;
         case "get_specific_employees":

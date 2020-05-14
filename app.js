@@ -11,7 +11,7 @@ db.authenticate().then(() => {
     console.log('Database can not connect; ' + err)
 });
 
-db.sync();////modellerle tablo olusturur
+db.sync();////{force:true}modellerle tablo olusturur
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
 app.use(cors());

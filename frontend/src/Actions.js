@@ -222,6 +222,7 @@ export function finish_project(reqBody) {
     return async dispatch => {
         let response = null;
         let error = false;
+        let show = false;
         await fetch('http://localhost:8000/finish_project', {
             method: 'POST',
             headers: {
@@ -237,6 +238,7 @@ export function finish_project(reqBody) {
             if(error){
                 response = resData.Error;
             }else{
+                show = true;
                 response = resData.Response;
             }
 
@@ -247,7 +249,8 @@ export function finish_project(reqBody) {
             type: "finish_project",
             payload: {
                 Response:response,
-                Error: error
+                Error: error,
+                Show : show
             }
         });
     };

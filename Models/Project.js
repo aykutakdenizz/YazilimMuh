@@ -1,3 +1,5 @@
+const Manager = require("./Manager");
+
 const sequelize = require('sequelize');
 const db = require('../Conf/dbConf');
 
@@ -5,6 +7,10 @@ const db = require('../Conf/dbConf');
 const Project = db.define('Project', {
         manager_id: {
             type: sequelize.Sequelize.INTEGER,
+            references: {
+                model: 'Manager',
+                key: 'id'
+            }
         },
         id: {
             type: sequelize.Sequelize.INTEGER,
@@ -58,4 +64,8 @@ const Project = db.define('Project', {
         timestamps: false,
         tableName: "Project"
     });
+
+Project.associate = (models) => {
+    Project.hasOne(Manager);
+};
 module.exports = Project;

@@ -103,7 +103,7 @@ class Project extends Component {
                 </Modal>
 
                 <Modal show={this.props.reducer.Show}>
-                    <Modal.Header closeButton onClick={this.props.set_error_false}>
+                    <Modal.Header closeButton onClick={this.props.set_show_false}>
                         <Modal.Title>Response</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>{this.props.reducer.Response}</Modal.Body>

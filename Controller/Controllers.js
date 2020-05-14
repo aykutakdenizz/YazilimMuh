@@ -215,11 +215,12 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
             id: employee_id
         }
     }).then(async employee => {
-        if (!(employee.active_project.length >= 0)) {
-            await Project.findAll().then(projects => {
+        console.log(employee.active_project.length);
+        if ((employee.active_project.length === 0)) {
+            await Project.findAll().then(async projects => {
                 let can_assign;
                 for (let i = 0; i < projects.length; i++) {
-                    if (projects[i].current_emp_num < projects[i].max_emp) {
+                    if ((projects[i].is_finished===false) && (projects[i].current_emp_num < projects[i].max_emp)){
                         can_assign = try_assign(employee, projects[i]);
                         if (can_assign) {
                             let employeeProjects = [];
@@ -240,7 +241,7 @@ exports.assign_emp_to_project = (req, res, next) => { // Faz (Employee)
                 } else {
                     console.log(employee.name, "Atanamadı.");
                     return res.status(400).json({
-                        Response: employee.name+" can not assign"
+                        Error: employee.name+" can not assign!"
                     });
                 }
             });
@@ -349,7 +350,7 @@ exports.start_project = (req, res, next) => { // Faz(project)
             });
         }
         if (project.current_emp_num >= project.min_emp) {
-            Project.update({active: true, start_date: new Date(),end_date:null}, {where: {id: project.id}}).then(result => {
+            Project.update({active: true, start_date: new Date(),end_date:null,is_finished:false}, {where: {id: project.id}}).then(result => {
                 return res.status(201).json({
                     Response: result[0]
                 });
@@ -383,7 +384,7 @@ exports.finish_project = async (req, res, next) => { // Yusuf (project1)
             Error: 'Project is not active'
         });
     }
-    project.update({end_date: new Date(), is_finished: true, active: false}, {where: {id: project.id}});
+    project.update({end_date: new Date(), is_finished: true, active: false,current_emp_num:0}, {where: {id: project.id}});
 
     const managers = await Manager.findAll();
     const analysts = await Analyst.findAll();
@@ -411,9 +412,43 @@ exports.finish_project = async (req, res, next) => { // Yusuf (project1)
 };
 
 function dismissal_employee(employee,type) {  // Yusuf
-    //employees = employees.filter(item => item !== employee)
-    //Tazminat şeysini yap akjdalskas
-    //compensation = calculate_compensation(employee)
+    /*if(type ===null){
+        // !!!   BASKA SITEDEN ALINACAKSA IF BLOĞU YORUM SATIRI OLMAKTAN CIKARILIR !!!
+        const postData = querystring.stringify({
+            'msg': 'Hello World!'
+        });
+        const options = {
+            hostname: 'www.google.com',
+            port: 80,
+            path: '/upload',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+        const req = http.request(options, (res) => {
+            console.log(`STATUS: ${res.statusCode}`);
+            console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+            res.setEncoding('utf8');
+            res.on('data', (chunk) => {
+                console.log(`BODY: ${chunk}`);
+            });
+            res.on('end', () => {
+                console.log('No more data in response.');
+            });
+        });
+
+        req.on('error', (e) => {
+            console.error(`problem with request: ${e.message}`);
+        });
+
+        // Write data to request body
+        req.write(postData);
+        req.end();
+        return 0;
+    }
+    */
     return (type+" ID:"+employee.id+" "+employee.name + " "+ employee.surname+ "'s compensation is:" + calculate_compensation(employee.salary));
 }
 
@@ -532,7 +567,7 @@ async function finishProjectForEmployee(employees, project, dbObject, dismisals)
             let isAssign = null;
 
             if (!(employee.active_project.length > 0)) {
-                await Project.findAll().then(projects => {
+                await Project.findAll().then(async projects => {
                     let can_assign = false;
                     for (let i = 0; i < projects.length; i++) {
                         if (projects[i].current_emp_num < projects[i].max_emp && projects[i].active === true) {
@@ -547,9 +582,16 @@ async function finishProjectForEmployee(employees, project, dbObject, dismisals)
                             }
                         }
                     }
-                    if (can_assign)
+                    if (can_assign){
+                        dismisals.push(employee.name+" assign to "+projects[i].name+"\n");
                         console.log(employee.name, employee.active_project.name, " e atandı . ");
+                    }
                     else
+                        await dbObject.destroy({
+                            where: {
+                                id: employee.id
+                            }
+                        });
                         console.log(employee.name, "Atanamadı.");
 
                     isAssign = can_assign;
@@ -561,7 +603,7 @@ async function finishProjectForEmployee(employees, project, dbObject, dismisals)
             }
             console.log("isAssign :" + isAssign);
             if (isAssign === false) {
-                dismisals.push(dismissal_employee(employee,employee.constructor.name.toString()));
+                dismisals.push(dismissal_employee(employee,employee.constructor.name.toString())+"\n");
             }
 
         }

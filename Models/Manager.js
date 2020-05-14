@@ -1,3 +1,5 @@
+const Project = require("./Project");
+
 const sequelize = require('sequelize');
 const db = require('../Conf/dbConf');
 
@@ -32,4 +34,9 @@ const Manager = db.define('Manager', {
         tableName: "Manager"
     });
 //Manager.sync();
+Manager.associate = (models) => {
+    Manager.hasMany(Project)
+};
+
+
 module.exports = Manager;
