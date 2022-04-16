@@ -9,3 +9,9 @@ Conf dosyası içerisindeki veritabanı bağlantınızı kurmalısınız.dbConf.
 Bu noktadan sonra consolda "nodemon app" diyerek server çalıştırmaya başlanabilir.
 
 Bu adımdan sonra consoldan frontend dizinine geçilmelidir. tekrardan "npm install" komutuyla Clieent için bağımlılıklar indirilip "npm start" komutu ile Client çalıştırılır.
+
+
+Contributers:
+Aykut Akdeniz
+Yusuf ANI
+Fazlı Bozatay
